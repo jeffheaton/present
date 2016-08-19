@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+
+<!-- Evolver Model Specification File -->
+<RePastEvolver:EvolverModelSpec xmlns:RePastEvolver="http://src.uchicago.edu/simbuilder/">
+<RePastEvolver:EvolverProject  ProjectDirectory="/Users/jheaton/Desktop/Repast-3.1/RepastPy/output" PackageName="default_package" ProjectName="Environment" ClassPath="" consoleErr="true" consoleOut="true" >
+<Description>
+<![CDATA[
+
+]]>
+</Description>
+<RePastEvolver:EvolverModel  ModelName="DemandModel" DisplayName="Product Demand Model" Class="class uchicago.src.simbuilder.beans.network.NetworkModelProducer"  >
+  <RePastEvolver:action name="initAgents" retType="void" imports="" paramNames="">
+<![CDATA[
+# Cause the customers to demand random products.
+for consumer as ConsumerAgent in self.consumers:
+  product_num = Random.uniform.nextIntFromTo(0, 4)
+  consumer.setProductDesired(product_num)
+
+# Cause the insurers to offer random products.  
+for insurer as InsurerAgent in self.insurers:
+  product_num = Random.uniform.nextIntFromTo(0, 4)
+  insurer.setCurrentProduct(product_num)
+]]>
+</RePastEvolver:action>
+
+
+<RePastEvolver:parameter name="probNewProduct" type="double" defaultValue="0.2" probe="true" accessible="true" />
+
+
+<RePastEvolver:schedule order="0 1 2" />
+
+<RePastEvolver:EvolverBean type="Compileable" class="class uchicago.src.simbuilder.beans.network.NetworkNodeProducer" name="ConsumerAgent"
+  groupName="consumers">
+  <RePastEvolver:action name="step" retType="void" imports="" paramNames="">
+<![CDATA[
+# Choose a random insurer to obtain the product from.
+insurer_num = Random.uniform.nextIntFromTo(0, self.model.insurers.size()-1)
+insurer = (InsurerAgent)self.model.insurers.get(insurer_num)
+
+# If the insurer has the product, then obtain it.
+if insurer.getCurrentProduct() == self.productDesired:
+  insurer.setCash(insurer.getCash()+1)
+  self.requestFilled=self.productDesired
+  self.productDesired = self.productDesired + 1
+  insurer.setFilledRequests(insurer.getFilledRequests()+1)
+  # Change our product desired, simply cycle between 0 and 4.
+  if self.productDesired>=5:
+    self.productDesired=0
+else:
+# If the insurer does not have the product, then record that.
+  insurer.setFailedRequests(insurer.getFailedRequests()+1)
+  self.requestFilled=-1
+]]>
+</RePastEvolver:action>
+
+
+<RePastEvolver:parameter name="productDesired" type="int" defaultValue="0" probe="false" accessible="true" />
+<RePastEvolver:parameter name="requestFailed" type="int" defaultValue="0" probe="false" accessible="true" />
+<RePastEvolver:parameter name="requestFilled" type="int" defaultValue="0" probe="false" accessible="true" />
+
+<RePastEvolver:schedule_item action="step" tick="1" type="1" last="false" target="for all ConsumerAgent" id="0"/>
+
+
+<RePastEvolver:network_source class="uchicago.src.simbuilder.beans.network.UnlinkedNodeNetworkSource" numberOfNodes="10" />
+</RePastEvolver:EvolverBean>
+
+
+
+
+<RePastEvolver:EvolverBean type="Compileable" class="class uchicago.src.simbuilder.beans.network.NetworkNodeProducer" name="InsurerAgent"
+  groupName="insurers">
+  <RePastEvolver:action name="step" retType="void" imports="" paramNames="">
+<![CDATA[
+
+if self.failedRequests>0:
+  ratio = self.filledRequests / self.failedRequests
+
+  if ratio < 0.2:
+    refit = Random.uniform.nextDouble()
+    if refit<self.model.probNewProduct:
+      self.currentProduct = Random.uniform.nextIntFromTo(0, 4)
+      self.cash = self.cash - 5
+]]>
+</RePastEvolver:action>
+
+
+<RePastEvolver:parameter name="currentProduct" type="int" defaultValue="1" probe="false" accessible="true" />
+<RePastEvolver:parameter name="cash" type="int" defaultValue="50" probe="false" accessible="true" />
+<RePastEvolver:parameter name="filledRequests" type="double" defaultValue="0" probe="false" accessible="true" />
+<RePastEvolver:parameter name="failedRequests" type="double" defaultValue="0" probe="false" accessible="true" />
+
+<RePastEvolver:schedule_item action="step" tick="1" type="1" last="false" target="for all InsurerAgent" id="1"/>
+
+
+<RePastEvolver:network_source class="uchicago.src.simbuilder.beans.network.UnlinkedNodeNetworkSource" numberOfNodes="10" />
+</RePastEvolver:EvolverBean>
+
+
+
+
+<RePastEvolver:EvolverBean type="Component" class="uchicago.src.simbuilder.beans.SequenceGraph" name="_sequenceGraph" title="Product Demand" xAxisTitle="Time"
+ yAxisTitle="Quantity Demanded" xAxisStart="100.0" yAxisStart="10.0">
+
+
+<RePastEvolver:file_property doWrite="false" fileName="" />
+<RePastEvolver:seqAction name="product1" imports="" retVal="double" paramNames="" color="" pointType="-1">
+<![CDATA[
+sum = 0
+for consumer as ConsumerAgent in self.consumers:
+  if consumer.getProductDesired()==0:
+    sum = sum + 1
+return sum
+]]>
+</RePastEvolver:seqAction>
+<RePastEvolver:seqAction name="product2" imports="" retVal="double" paramNames="" color="" pointType="-1">
+<![CDATA[
+sum = 0
+for consumer as ConsumerAgent in self.consumers:
+  if consumer.getProductDesired()==1:
+    sum = sum + 1
+return sum
+]]>
+</RePastEvolver:seqAction>
+<RePastEvolver:seqAction name="product3" imports="" retVal="double" paramNames="" color="" pointType="-1">
+<![CDATA[
+sum = 0
+for consumer as ConsumerAgent in self.consumers:
+  if consumer.getProductDesired()==2:
+    sum = sum + 1
+return sum
+]]>
+</RePastEvolver:seqAction>
+<RePastEvolver:seqAction name="product4" imports="" retVal="double" paramNames="" color="" pointType="-1">
+<![CDATA[
+sum = 0
+for consumer as ConsumerAgent in self.consumers:
+  if consumer.getProductDesired()==3:
+    sum = sum + 1
+return sum
+]]>
+</RePastEvolver:seqAction>
+<RePastEvolver:seqAction name="product5" imports="" retVal="double" paramNames="" color="" pointType="-1">
+<![CDATA[
+sum = 0
+for consumer as ConsumerAgent in self.consumers:
+  if consumer.getProductDesired()==4:
+    sum = sum + 1
+return sum
+]]>
+</RePastEvolver:seqAction>
+<RePastEvolver:schedule_item action="update" tick="1" type="1" last="false" target="Sequence Graph: _sequenceGraph" id="2"/>
+
+</RePastEvolver:EvolverBean>
+
+
+
+
+
+</RePastEvolver:EvolverModel>
+</RePastEvolver:EvolverProject>
+</RePastEvolver:EvolverModelSpec>
