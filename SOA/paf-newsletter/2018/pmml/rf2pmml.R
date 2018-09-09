@@ -12,7 +12,8 @@ trainData <- iris[z==1,]
 testData <- iris[z==2,]
 
 # train model
-rf <- randomForest(Species~.,data=trainData,ntree=100,proximity=TRUE)
+rf <- randomForest(Species~.,data=trainData,
+                   ntree=100,proximity=TRUE)
 table(predict(rf),trainData$Species)
 
 
