@@ -66,6 +66,7 @@ conda update -y --all
 
 ## My R Environment
 
+```
 conda create -n r_env r-essentials r-base
 source activate r_env
 conda install -y r-caret
@@ -86,6 +87,7 @@ conda install -y r-rms
 conda install -y r-ggplot2
 conda install -y r-openxlsx
 conda install -y r-splines
+```
 
 ## Jupyter Lab Extensions
 
