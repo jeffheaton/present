@@ -1,8 +1,6 @@
 # Process_Wikipedia
 # Copyright 2021 by Jeff Heaton, released under the MIT License
 # https://github.com/jeffheaton
-import bs4
-from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import xml.etree.ElementTree as etree
 import multiprocessing as mp
@@ -17,6 +15,10 @@ import urllib
 import json
 import sys
 import hashlib
+try: 
+    from BeautifulSoup import BeautifulSoup
+except ImportError:
+    from bs4 import BeautifulSoup
 
 WIKIPEDIA_URL = 'https://dumps.wikimedia.org/'
 WIKIPEDIA_LANG = 'enwiki'
