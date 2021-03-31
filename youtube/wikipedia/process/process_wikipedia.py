@@ -220,6 +220,7 @@ class ExtractWikipedia:
         for file in self.files:
             inputQueue.put(file)
 
+        self.payload.open()
         while self.file_count < len(self.files):
             evt = outputQueue.get()
             
@@ -244,6 +245,7 @@ class ExtractWikipedia:
         print("waiting for workers to write remaining results")
         for p in processes:
             p.join()
+        self.payload.close()
 
         print("Elapsed time: {}".format(hms_string(elapsed_time)))   
         print("done")  
