@@ -244,17 +244,23 @@ class ExtractWikipedia:
         else:
             return files2[0]
         
-
-
-    
-    def process(self):
+    def process_single_file(self, filename=None):
         start_time = time.time()
-        self.files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
+        if filename==None:
+            files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
+            files.sort()
+            filename = files[0]
+        self.process([filename])
+        
+    def process(self, files=None):
+        if files is None:
+            files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
+            if len(files)==0:
+                raise FileNotFoundError(f"No wiki files located at: {self.wiki_path}")
+        
+        start_time = time.time()
 
-        if len(self.files)==0:
-            raise FileNotFoundError(f"No wiki files located at: {self.wiki_path}")
-
-        print(f"Processing {len(self.files)} files")
+        print(f"Processing {len(files)} files")
         cpus = mp.cpu_count()
         print(f"Detected {cpus} cores.")
         workers = cpus * 1
@@ -272,18 +278,18 @@ class ExtractWikipedia:
             p.start()
             processes.append(p)
 
-        for file in self.files:
+        for file in files:
             inputQueue.put(file)
 
         self.payload.open()
-        while self.file_count < len(self.files):
+        while self.file_count < len(files):
             evt = outputQueue.get()
             
             if "completed" in evt:
                 self.total_count += evt["completed"]
                 self.current_update = int(self.total_count / ENTIRE_TASK_REPORT)
                 if self.current_update != self.last_update:
-                    print(f"{self.current_update*ENTIRE_TASK_REPORT:,}; files: {self.file_count}/{len(self.files)}")
+                    print(f"{self.current_update*ENTIRE_TASK_REPORT:,}; files: {self.file_count}/{len(files)}")
                     self.last_update = self.current_update
             elif "file_complete" in evt:
                 self.file_count += 1
@@ -293,15 +299,14 @@ class ExtractWikipedia:
         for i in range(cpus):
             inputQueue.put("**exit**") 
 
-        print(f"{self.total_count:,}; files: {self.file_count}/{len(self.files)}")
-
-        elapsed_time = time.time() - start_time
+        print(f"{self.total_count:,}; files: {self.file_count}/{len(files)}")
 
         print("waiting for workers to write remaining results")
         for p in processes:
             p.join()
         self.payload.close()
 
+        elapsed_time = time.time() - start_time
         print("Elapsed time: {}".format(hms_string(elapsed_time)))   
         print("done")  
         
