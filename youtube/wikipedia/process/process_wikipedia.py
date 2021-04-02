@@ -180,6 +180,8 @@ class ExtractWikipediaFile:
                 else:
                     if tname == 'title':
                         title = elem.text
+                    elif tname == 'text':
+                        text = elem.text
                     elif tname == 'id' and not inrevision:
                         id = int(elem.text)
                     elif tname == 'redirect':
@@ -199,10 +201,11 @@ class ExtractWikipediaFile:
                             else:
                                 self.redirectCount += 1
                                 #print(f"Article: {title}")
-                                self.worker.process_article(id, title)
+                                self.worker.process_article(id, title, text)
 
                         title = ""
                         redirect = ""
+                        text = ""
                         ns = -100
                         if self.totalCount > 1 and (self.totalCount % WORKER_REPORT) == 0:
                             self.worker.report_progress(self.totalCount)
