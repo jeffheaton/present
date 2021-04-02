@@ -12,6 +12,7 @@ import time
 import os,glob
 import traceback
 import urllib
+import urllib.request
 import json
 import sys
 import hashlib
@@ -41,29 +42,6 @@ def strip_tag_name(t):
         t = t[idx + 1:]
     return t
 
-def get_wikidump_available(wiki_url=WIKIPEDIA_URL,wiki_lang=WIKIPEDIA_LANG):
-    base_url = posixpath.join(wiki_url, wiki_lang)
-    index = urllib.request.urlopen(base_url).read()
-    soup_index = BeautifulSoup(index, 'html.parser')
-    # Find the links on the page
-    return [a['href'] for a in soup_index.find_all('a') if 
-             a.has_attr('href')]
-
-def get_latest_wikidump(dumps):
-    lst = []
-    for dump in dumps:
-        try:
-            idx = dump.index('/')
-            
-            if idx != -1:
-                dump = dump[:idx]
-            
-            lst.append(int(dump))
-        except ValueError:
-            pass
-        
-    return max(lst)
-
 def sha1_file(path):
     sha1 = hashlib.sha1()
     with open(path, 'rb') as f:
@@ -74,49 +52,96 @@ def sha1_file(path):
             sha1.update(data)
     return sha1.hexdigest()
 
-def wikidump_download(target_path, wiki_url=WIKIPEDIA_URL,wiki_lang=WIKIPEDIA_LANG, timestamp=None):
-    if not timestamp:
-        timestamp = get_latest_wikidump(get_wikidump_available(wiki_url,wiki_lang))
-    
-    dump_url = posixpath.join(wiki_url, wiki_lang, str(timestamp))
-    print(dump_url)
-    
-    status_file = posixpath.join(dump_url, 'dumpstatus.json')
-    dump_json = urllib.request.urlopen(status_file).read()
-    dump_status = json.loads(dump_json)
-    dump_current = dump_status['jobs']['metacurrentdump']
-    job_status = dump_current['status']
-    
-    if job_status != 'done':
-        raise ValueError(f"Current article dump status: [job_status]")
-        
-    files = dump_current['files']
-    for file in files.keys():
-        meta = files[file]
-        source_url = urllib.parse.urljoin(wiki_url, meta['url'])
-        target_file = os.path.join(target_path,file)
-        if os.path.exists(target_file):
-            sha1_local = sha1_file(target_file)
-            if sha1_local != meta['sha1']:
-                print(f"Corrupt: {file}")
-                os.remove("file")
-                should_download = True
-            else:
-                print(f"Exists: {file}")
-                should_download = False
-        else:
-            print(f"Missing: {file}")
-            should_download = True
-            
-        if should_download:
+class WikiDump:
+    def __init__(self, wiki_lang=WIKIPEDIA_LANG, wiki_base_url=WIKIPEDIA_URL):
+        self.wiki_lang = wiki_lang
+        self.wiki_base_url = wiki_base_url
+        self.wiki_url = posixpath.join(self.wiki_base_url, self.wiki_lang)
+
+    def get_wikidump_available(self):
+        index = urllib.request.urlopen(self.wiki_url).read()
+        soup_index = BeautifulSoup(index, 'html.parser')
+        # Find the links on the page
+        return [a['href'] for a in soup_index.find_all('a') if 
+                a.has_attr('href')]
+
+    def get_latest_dump(self, dumps):
+        lst = []
+        for dump in dumps:
             try:
-                urllib.request.urlretrieve(source_url, target_file)
-                print(f"Downloaded: {file}")
-            except urllib.error.URLError as e:
+                idx = dump.index('/')
+                
+                if idx != -1:
+                    dump = dump[:idx]
+                
+                lst.append(int(dump))
+            except ValueError:
+                pass
+        lst.sort(reverse=True)
+        status = self.get_status(lst[0])
+        if status['jobs']['metacurrentdump']['status'] != 'done':
+            return lst[1]
+        return lst[0]
+
+    def get_status(self, wiki_date):
+        dump_url = posixpath.join(self.wiki_url, str(wiki_date))
+        status_file = posixpath.join(dump_url, 'dumpstatus.json')
+        dump_json = urllib.request.urlopen(status_file).read()
+        return json.loads(dump_json)
+
+class DownloadWikifile:
+    def __init__(self, wiki_lang=WIKIPEDIA_LANG, wiki_base_url=WIKIPEDIA_URL, wiki_date=None):
+        self.wiki_lang = wiki_lang
+        self.wiki_base_url = wiki_base_url
+
+        if not wiki_date:
+            dump_site = WikiDump(self.wiki_lang, wiki_base_url)
+            dumps = dump_site.get_wikidump_available()
+            self.wiki_date = dump_site.get_latest_dump(dumps)
+        else:
+            self.wiki_date = wiki_date
+        self.dump_url = posixpath.join(self.wiki_base_url, self.wiki_lang, str(self.wiki_date)) 
+
+    def download(self, path):
+        target_path = os.path.join(path, "dl", str(self.wiki_date))
+        
+        status_file = posixpath.join(self.dump_url, 'dumpstatus.json')
+        dump_json = urllib.request.urlopen(status_file).read()
+        dump_status = json.loads(dump_json)
+        dump_current = dump_status['jobs']['metacurrentdump']
+        job_status = dump_current['status']
+        
+        if job_status != 'done':
+            raise ValueError(f"Current Wikipedia dump is not complete yet, current dump status is: {job_status}")
+            
+        files = dump_current['files']
+        for file in files.keys():
+            meta = files[file]
+            source_url = urllib.parse.urljoin(self.dump_url, meta['url'])
+            target_file = os.path.join(target_path,file)
+            if os.path.exists(target_file):
+                sha1_local = sha1_file(target_file)
+                if sha1_local != meta['sha1']:
+                    print(f"Corrupt: {file}")
+                    os.remove("file")
+                    should_download = True
+                else:
+                    print(f"Exists: {file}")
+                    should_download = False
+            else:
+                print(target_path)
+                print(f"Missing: {file}")
+                should_download = True
+                
+            if should_download:
                 try:
-                    os.remove(target_file)
-                finally:
-                    print(f"Download Error: {file}")
+                    urllib.request.urlretrieve(source_url, target_file)
+                    print(f"Downloaded: {file}")
+                except urllib.error.URLError as e:
+                    try:
+                        os.remove(target_file)
+                    finally:
+                        print(f"Download Error: {file}")
 
 
 class ExtractWikipediaFile:
@@ -189,16 +214,46 @@ class ExtractWikipediaFile:
 class ExtractWikipedia:
     """ This is the main controller class, it runs in the main process and aggregates results from the individual 
         processes used to distribute the workload."""
-    def __init__(self, payload, path):
-        self.wiki_path = path
+    def __init__(self, payload, path, wiki_lang=WIKIPEDIA_LANG, wiki_date=None):
+        if wiki_date is None:
+            wiki_date = ExtractWikipedia.find_latest_dump(path)
+            if wiki_date is None:
+                raise FileNotFoundError("No wiki dumps have been downloaded.")
+
+        self.wiki_path = target_path = os.path.join(path, "dl", str(wiki_date))
         self.total_count = 0
         self.file_count = 0
         self.last_update = 0
         self.payload = payload
+
+    @staticmethod
+    def find_latest_dump(path):
+        target_path = os.path.join(path, "dl")
+        files = glob.glob(os.path.join(target_path, "*", ""))
+        files = [os.path.basename(os.path.normpath(x)) for x in files]
+        files2 = []
+        for f in files:
+            try:
+                i = int(f)
+            finally:
+                files2.append(f)
+        files2.sort(reverse=True)
+        
+        if len(files2)<1:
+            return None
+        else:
+            return files2[0]
+        
+
+
     
     def process(self):
         start_time = time.time()
         self.files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
+
+        if len(self.files)==0:
+            raise FileNotFoundError(f"No wiki files located at: {self.wiki_path}")
+
         print(f"Processing {len(self.files)} files")
         cpus = mp.cpu_count()
         print(f"Detected {cpus} cores.")

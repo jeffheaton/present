@@ -1,9 +1,9 @@
 from multiprocessing import freeze_support
 from process_wikipedia import *
 
+WIKIPEDIA_ROOT = "/Users/jheaton/jth/wikipedia"
 #WIKIPEDIA_ROOT = "/home/jeff/data/wikipedia"
-WIKIPEDIA_ROOT = "C:\\Users\\jeffh\\data\\wikipedia\\"
-WIKIPEDIA_DL = os.path.join(WIKIPEDIA_ROOT, 'dl')
+#WIKIPEDIA_ROOT = "C:\\Users\\jeffh\\data\\wikipedia\\"
 
 class ProcessPagesWorker():
     def __init__(self, config, outputQueue):
@@ -69,7 +69,8 @@ class ProcessPages:
 if __name__ == '__main__':
     freeze_support()
     wiki = ExtractWikipedia(
-        ProcessPages(WIKIPEDIA_ROOT), # where you want the extracted Wikipedia files to go
-        WIKIPEDIA_DL #Location you downloaded Wikipedia to
+        payload=ProcessPages(WIKIPEDIA_ROOT), # where you want the extracted Wikipedia files to go
+        path=WIKIPEDIA_ROOT #Location you downloaded Wikipedia to
     )
     wiki.process()
+
