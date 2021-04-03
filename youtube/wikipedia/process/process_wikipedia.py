@@ -191,17 +191,21 @@ class ExtractWikipediaFile:
                     elif tname == 'page':
                         self.totalCount += 1
 
-                        if ns == 10:
-                            self.templateCount += 1
-                            self.worker.process_template(id, title)
-                        elif ns == 0:
-                            if len(redirect) > 0:
-                                self.articleCount += 1
-                                self.worker.process_redirect(id, title, redirect)
-                            else:
-                                self.redirectCount += 1
-                                #print(f"Article: {title}")
-                                self.worker.process_article(id, title, text)
+                        try:
+                            if ns == 10:
+                                self.templateCount += 1
+                                self.worker.process_template(id, title)
+                            elif ns == 0:
+                                if len(redirect) > 0:
+                                    self.articleCount += 1
+                                    self.worker.process_redirect(id, title, redirect)
+                                else:
+                                    self.redirectCount += 1
+                                    #print(f"Article: {title}")
+                                    self.worker.process_article(id, title, text)
+                        except Exception as e:
+                            print(f"Error processing: {id}:{title}")
+                            print(e)
 
                         title = ""
                         redirect = ""

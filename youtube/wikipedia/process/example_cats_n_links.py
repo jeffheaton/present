@@ -23,22 +23,24 @@ class CatsAndLinksWorker():
 
         page = wtp.parse(text)
         tlist = set()
+        o = []
         for t in page.templates:
             tname = t.name.strip()
             if tname not in tlist:
                 tlist.add(tname)
-                self.outputQueue.put(
-                  {'article_template':[id, tname]}
-                )
+                o.append([id, tname])
+                
+        self.outputQueue.put({'article_template':o})
 
         llist = set()
+        o = []
         for l in page.wikilinks:
             ltitle = l.title.strip()
             if ltitle not in llist:
                 llist.add(ltitle)
-                self.outputQueue.put(
-                  {'article_link':[id, ltitle]}
-                )
+                o.append([id, ltitle])
+
+        self.outputQueue.put({'article_link':o})
 
     
     def process_redirect(self, id, title, redirect):
@@ -72,11 +74,11 @@ class CatsAndLinksPages:
         self.redirectWriter = csv.writer(self.redirect_fp, quoting=csv.QUOTE_MINIMAL)
         self.templateWriter = csv.writer(self.template_fp, quoting=csv.QUOTE_MINIMAL)
         
-        self.articlesWriter.writerow(['id', 'title'])
+        self.articlesWriter.writerow(['article_id', 'title'])
         self.articleTemplatesWriter.writerow(['article_id', 'template_name'])
         self.articleLinkWriter.writerow(['source_article_id', 'target_article_name'])
-        self.redirectWriter.writerow(['id', 'title', 'redirect'])
-        self.templateWriter.writerow(['id', 'title'])
+        self.redirectWriter.writerow(['article_id', 'title', 'redirect'])
+        self.templateWriter.writerow(['article_id', 'title'])
 
     def close(self):
         self.articles_fp.close()
@@ -90,9 +92,9 @@ class CatsAndLinksPages:
         if "article" in evt:
             self.articlesWriter.writerow(evt['article'])
         elif "article_template" in evt:
-            self.articleTemplatesWriter.writerow(evt['article_template'])
+            self.articleTemplatesWriter.writerows(evt['article_template'])
         elif "article_link" in evt:
-            self.articleLinkWriter.writerow(evt['article_link'])
+            self.articleLinkWriter.writerows(evt['article_link'])
         elif "template" in evt:
             self.templateWriter.writerow(evt['template'])
         elif "redirect" in evt:
@@ -107,5 +109,5 @@ if __name__ == '__main__':
         payload=CatsAndLinksPages(WIKIPEDIA_ROOT), # where you want the extracted Wikipedia files to go
         path=WIKIPEDIA_ROOT #Location you downloaded Wikipedia to
     )
-    wiki.process_single_file()
+    wiki.process()
 
