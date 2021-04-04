@@ -2,9 +2,9 @@ from multiprocessing import freeze_support
 from process_wikipedia import *
 import wikitextparser as wtp
 
-WIKIPEDIA_ROOT = "/Users/jheaton/jth/wikipedia"
+#WIKIPEDIA_ROOT = "/Users/jheaton/jth/wikipedia"
 #WIKIPEDIA_ROOT = "/home/jeff/data/wikipedia"
-#WIKIPEDIA_ROOT = "C:\\Users\\jeffh\\data\\wikipedia\\"
+WIKIPEDIA_ROOT = "C:\\jth\\data\\wikipedia\\"
 
 class CatsAndLinksWorker():
     def __init__(self, config, outputQueue):

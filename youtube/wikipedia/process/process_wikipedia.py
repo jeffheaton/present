@@ -104,6 +104,8 @@ class DownloadWikifile:
 
     def download(self, path):
         target_path = os.path.join(path, "dl", str(self.wiki_date))
+        os.makedirs(target_path, exist_ok=True)
+
         
         status_file = posixpath.join(self.dump_url, 'dumpstatus.json')
         dump_json = urllib.request.urlopen(status_file).read()
