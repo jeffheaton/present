@@ -10,3 +10,7 @@ This can be run after the previous section has downloaded Wikipedia data.  This 
 * article.csv - A listing of all articles on Wikipedia, with their Wikipedia ID.
 * redirect.csv - A listing of all redirects of articles on Wikipedia. e.g. USA to United_States
 * template.csv - A listing of all templates on Wikipedia.  These are the "types" of articles.
+
+# Running
+
+nohup python example_cats_n_links.py >/home/log.txt &

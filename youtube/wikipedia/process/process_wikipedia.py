@@ -16,6 +16,7 @@ import urllib.request
 import json
 import sys
 import hashlib
+import queue
 try: 
     from BeautifulSoup import BeautifulSoup
 except ImportError:
@@ -28,6 +29,8 @@ ENTIRE_TASK_REPORT = 100000
 QUEUE_SIZE = 50
 ENCODING = "utf-8"
 BUF_SIZE = 65536
+GET_TIMEOUT = 1 * 60
+GET_RETRY = 5
 
 # Nicely formatted time string
 def hms_string(sec_elapsed):
@@ -223,7 +226,7 @@ class ExtractWikipediaFile:
 class ExtractWikipedia:
     """ This is the main controller class, it runs in the main process and aggregates results from the individual 
         processes used to distribute the workload."""
-    def __init__(self, payload, path, wiki_lang=WIKIPEDIA_LANG, wiki_date=None):
+    def __init__(self, payload, path, wiki_lang=WIKIPEDIA_LANG, wiki_date=None, files=None):
         if wiki_date is None:
             wiki_date = ExtractWikipedia.find_latest_dump(path)
             if wiki_date is None:
@@ -234,6 +237,9 @@ class ExtractWikipedia:
         self.file_count = 0
         self.last_update = 0
         self.payload = payload
+        self.files = files
+        self.workers_running = 0
+        self.workers = 0
 
     @staticmethod
     def find_latest_dump(path):
@@ -260,83 +266,144 @@ class ExtractWikipedia:
             files.sort()
             filename = files[0]
         self.process([filename])
-        
-    def process(self, files=None):
-        if files is None:
-            files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
-            if len(files)==0:
+
+    def get_event(self, event_queue):
+        get_done = False
+        get_retry = 0
+        while not get_done:
+            try:                    
+                return event_queue.get(timeout=GET_TIMEOUT)
+            except queue.Empty:
+                get_retry += 1
+                if get_retry<= GET_RETRY:
+                    print(f"Queue get timeout, retry {get_retry}/{GET_RETRY}")
+                else:
+                    print(f"Queue timeout failed, retry {GET_RETRY} failed, exiting.")
+                    get_done = True
+                    return None
+
+    def handle_event(self, evt):
+        if "completed" in evt:
+            self.total_count += evt["completed"]
+            self.current_update = int(self.total_count / ENTIRE_TASK_REPORT)
+            if self.current_update != self.last_update:
+                print(f"{self.current_update*ENTIRE_TASK_REPORT:,}; files: {self.file_count}/{len(self.files)}, workers:{self.workers_running}/{self.workers}")
+                self.last_update = self.current_update
+        elif "file_complete" in evt:
+            self.file_count += 1
+        elif "**worker done**" in evt:
+            self.workers_running -= 1
+            print(f"Worker done: {evt['**worker done**']}")        
+
+    def process(self):
+        if self.files is None:
+            self.files = glob.glob(os.path.join(self.wiki_path, "*.bz2"))
+            if len(self.files)==0:
                 raise FileNotFoundError(f"No wiki files located at: {self.wiki_path}")
         
         start_time = time.time()
 
-        print(f"Processing {len(files)} files")
+        print(f"Processing {len(self.files)} files")
         cpus = mp.cpu_count()
         print(f"Detected {cpus} cores.")
-        workers = cpus * 1
-        print(f"Using {workers} threads")
+        self.workers = cpus * 1
+        print(f"Using {self.workers} threads")
 
         inputQueue = mp.Queue()
         outputQueue = mp.Queue(QUEUE_SIZE)
-        config = {
-            'payload': self.payload
-        }
+
 
         processes = []
-        for i in range(workers):
+        for i in range(self.workers):
+            config = {
+                'payload': self.payload,
+                'num': i
+            }
+
             p = mp.Process(target=ExtractWikipedia.worker, args=(inputQueue, outputQueue, config))
             p.start()
+            p.name = f"process-{i}"
             processes.append(p)
+        self.workers_running = self.workers
 
-        for file in files:
-            inputQueue.put(file)
+        for file in self.files:
+            inputQueue.put(file)            
 
-        self.payload.open()
-        while self.file_count < len(files):
-            evt = outputQueue.get()
-            
-            if "completed" in evt:
-                self.total_count += evt["completed"]
-                self.current_update = int(self.total_count / ENTIRE_TASK_REPORT)
-                if self.current_update != self.last_update:
-                    print(f"{self.current_update*ENTIRE_TASK_REPORT:,}; files: {self.file_count}/{len(files)}")
-                    self.last_update = self.current_update
-            elif "file_complete" in evt:
-                self.file_count += 1
-            
-            self.payload.handle_event(evt)
-
-        for i in range(cpus):
+        for i in range(self.workers*2):
             inputQueue.put("**exit**") 
 
-        print(f"{self.total_count:,}; files: {self.file_count}/{len(files)}")
+        self.payload.open()
+        error_exit = False
+        while (self.file_count < len(self.files)) and not error_exit:
+            evt = self.get_event(outputQueue)
+            self.handle_event(evt)
+            self.payload.handle_event(evt)
 
-        print("waiting for workers to write remaining results")
-        for p in processes:
-            p.join()
+        print(f"{self.total_count:,}; files: {self.file_count}/{len(self.files)}")
+        
+        self.shutdown(processes, outputQueue)
         self.payload.close()
+        inputQueue.close()
+        outputQueue.close()
 
         elapsed_time = time.time() - start_time
         print("Elapsed time: {}".format(hms_string(elapsed_time)))   
         print("done")  
-        
+
+    def shutdown(self, processes, event_queue):
+        done = False
+        print("waiting for workers to write remaining results")
+        while not done:
+            done = True
+            for p in processes:
+                p.join(10)
+                if p.exitcode==None: 
+                    done = False
+                try:                    
+                    evt=event_queue.get(timeout=10)
+                    self.handle_event(evt)
+                except queue.Empty:
+                    pass
+
+    @staticmethod
+    def get_event(workload_queue):
+        get_done = False
+        get_retry = 0
+        while not get_done:
+            try:                    
+                return workload_queue.get(timeout=GET_TIMEOUT)
+            except queue.Empty:
+                get_retry += 1
+                if get_retry<= GET_RETRY:
+                    print(f"Workload get timeout, retry {get_retry}/{GET_RETRY}")
+                else:
+                    print(f"Workload timeout failed, retry {GET_RETRY} failed, exiting.")
+                    get_done = True
+                    return None
+
     @staticmethod
     def worker(inputQueue, outputQueue, config):
-        payload_worker = config['payload'].get_worker_class(outputQueue, config)
-        done = False
+        try:
+            payload_worker = config['payload'].get_worker_class(outputQueue, config)
+            done = False
 
-        while not done:
-            try:
+            while not done:
                 path = inputQueue.get()
 
-                if path == "**exit**":
-                    return
+                if path != "**exit**":
+                    try:
+                        e = ExtractWikipediaFile(payload_worker)
+                        e.extract_file(path)
+                    except Exception as e:
+                        print(f"Error: {e}")
+                        traceback.print_exc()
+                    finally:
+                        outputQueue.put({"file_complete":True})
+                else:
+                    done = True
 
-                e = ExtractWikipediaFile(payload_worker)
-                e.extract_file(path)
-            except Exception as e:
-                print(f"Error: {e}")
-                traceback.print_exc()
-            finally:
-                outputQueue.put({"file_complete":True})
+        finally:
+            outputQueue.put({"**worker done**":config['num']})
+
         
         

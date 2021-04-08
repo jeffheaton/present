@@ -3,8 +3,10 @@ from process_wikipedia import *
 import wikitextparser as wtp
 
 #WIKIPEDIA_ROOT = "/Users/jheaton/jth/wikipedia"
-#WIKIPEDIA_ROOT = "/home/jeff/data/wikipedia"
-WIKIPEDIA_ROOT = "C:\\jth\\data\\wikipedia\\"
+WIKIPEDIA_ROOT = "/home/jeff/data/wikipedia"
+#WIKIPEDIA_ROOT = "C:\\jth\\data\\wikipedia\\"
+
+REMOVE_DUPS = True
 
 class CatsAndLinksWorker():
     def __init__(self, config, outputQueue):
@@ -26,7 +28,7 @@ class CatsAndLinksWorker():
         o = []
         for t in page.templates:
             tname = t.name.strip()
-            if tname not in tlist:
+            if tname not in tlist or not REMOVE_DUPS:
                 tlist.add(tname)
                 o.append([id, tname])
                 
@@ -36,7 +38,7 @@ class CatsAndLinksWorker():
         o = []
         for l in page.wikilinks:
             ltitle = l.title.strip()
-            if ltitle not in llist:
+            if ltitle not in llist or not REMOVE_DUPS:
                 llist.add(ltitle)
                 o.append([id, ltitle])
 
