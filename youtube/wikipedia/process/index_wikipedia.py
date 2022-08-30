@@ -1,6 +1,9 @@
 from multiprocessing import freeze_support
-from process_wikipedia import *
+from wikipedia_process import *
 import wikitextparser as wtp
+import ntpath
+
+from wikipedia_process import *
 
 #WIKIPEDIA_ROOT = "/Users/jheaton/jth/wikipedia"
 #WIKIPEDIA_ROOT = "/home/jeff/data/wikipedia"
@@ -9,7 +12,9 @@ WIKIPEDIA_ROOT = "/Users/jeff/data/wiki"
 
 REMOVE_DUPS = True
 
-class CatsAndLinksWorker():
+TOKEN_INFOBOX = "Infobox "
+
+class IndexWikipediaWorker():
     def __init__(self, config, outputQueue):
         self.config = config
         self.outputQueue = outputQueue
@@ -19,19 +24,27 @@ class CatsAndLinksWorker():
             {'template': [id, title] }
         )
     
-    def process_article(self, id, title, text):
-        self.outputQueue.put(
-            {'article': [id, title] }
-        )
-
+    def process_article(self, id, title, text, path):
         page = wtp.parse(text)
         tlist = set()
         o = []
+        iname = []
         for t in page.templates:
             tname = t.name.strip()
             if tname not in tlist or not REMOVE_DUPS:
                 tlist.add(tname)
                 o.append([id, tname])
+
+            if tname.startswith(TOKEN_INFOBOX):
+                iname.append(tname[len(TOKEN_INFOBOX):].strip())
+
+
+        if len(iname)==0:
+            iname = ""
+        elif len(iname)==1:
+            iname = iname[0]
+        else:
+            iname = str(iname)
                 
         self.outputQueue.put({'article_template':o})
 
@@ -45,6 +58,11 @@ class CatsAndLinksWorker():
 
         self.outputQueue.put({'article_link':o})
 
+        filename = ntpath.basename(path)
+        self.outputQueue.put(
+            {'article': [id, title, iname, filename] }
+        )
+
     
     def process_redirect(self, id, title, redirect):
         self.outputQueue.put(
@@ -54,7 +72,7 @@ class CatsAndLinksWorker():
     def report_progress(self, completed):
         self.outputQueue.put({"completed": completed})
 
-class CatsAndLinksPages:
+class IndexWikipedia:
     def __init__(self, output_path): 
         self.output_path = output_path       
         
@@ -77,7 +95,7 @@ class CatsAndLinksPages:
         self.redirectWriter = csv.writer(self.redirect_fp, quoting=csv.QUOTE_MINIMAL)
         self.templateWriter = csv.writer(self.template_fp, quoting=csv.QUOTE_MINIMAL)
         
-        self.articlesWriter.writerow(['article_id', 'title'])
+        self.articlesWriter.writerow(['article_id', 'title', 'infobox', 'file'])
         self.articleTemplatesWriter.writerow(['article_id', 'template_name'])
         self.articleLinkWriter.writerow(['source_article_id', 'target_article_name'])
         self.redirectWriter.writerow(['article_id', 'title', 'redirect'])
@@ -104,14 +122,14 @@ class CatsAndLinksPages:
             self.redirectWriter.writerow(evt['redirect'])
             
     def get_worker_class(self, outputQueue, config):
-        return CatsAndLinksWorker(config, outputQueue)
+        return IndexWikipediaWorker(config, outputQueue)
     
 if __name__ == '__main__':
     freeze_support()
     wiki = ExtractWikipedia(
-        payload=CatsAndLinksPages(WIKIPEDIA_ROOT), # where you want the extracted Wikipedia files to go
+        payload=IndexWikipedia(WIKIPEDIA_ROOT), # where you want the extracted Wikipedia files to go
         path=WIKIPEDIA_ROOT #Location you downloaded Wikipedia to
     )
-    wiki.process()
-    #wiki.process_single_file()
+    #wiki.process()
+    wiki.process_single_file()
 

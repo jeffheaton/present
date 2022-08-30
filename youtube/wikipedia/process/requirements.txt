@@ -1,2 +1,2 @@
-beautifulsoup4==4.9.3
-wikitextparser==0.47.4
+beautifulsoup4==4.11.1
+wikitextparser==0.49.2
