@@ -10,9 +10,9 @@ For this course we will execute the code using the free version of [Google CoLab
 Source code for course: *Note, I will likely tweak some of this code ahead of the final presentation*
 
 * Day 1: Forecasting Demand from Tabular Time Series Data
-** Example: [Exploratory Data Analysis (EDA)](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_eda.ipynb)
-** Example: [Univariate Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_univariate.ipynb)
-** Example: [Multivariate Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_multivariate.ipynb)
+    * Example: [Exploratory Data Analysis (EDA)](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_eda.ipynb)
+    * Example: [Univariate Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_univariate.ipynb)
+    * Example: [Multivariate Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_multivariate.ipynb)
 * Day 2: Forecasting Demand from 
-** Example: [Natural Language Processing Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_nlp.ipynb)
-** Example: [Computer Vision Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_cv.ipynb)
+    * Example: [Natural Language Processing Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_nlp.ipynb)
+    * Example: [Computer Vision Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_cv.ipynb)
