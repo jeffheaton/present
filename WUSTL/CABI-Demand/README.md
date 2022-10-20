@@ -16,22 +16,22 @@ Source code for the course:
 * Day 1: Forecasting Demand from Tabular Time Series Data
     * Utility: [GPU Status](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/status.ipynb)
     * Example: [Exploratory Data Analysis (EDA)](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_eda.ipynb) 
-        * Supplemental: [Pandas](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_02_1_python_pandas.ipynb)
-        * Lab 1: Data Visualization
+        * Supplemental: [Pandas](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/pandas.ipynb), [Pandas Course](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_02_1_python_pandas.ipynb)
+        * [Lab 1: Data Visualization](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-1-eda.ipynb)
     * Example: [Naive Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_naive.ipynb)
         * Supplemental: [Neural Network Overview](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_03_1_neural_net.ipynb)
         * Supplemental: [Kaggle: Store Item Demand Forecasting Challenge](https://www.kaggle.com/c/demand-forecasting-kernels-only)
     * Example: [Seasonality Aware Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_seasonality.ipynb)
-        * Lab 2: Feature Engineering
+        * [Lab 2: Feature Engineering](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-2-features.ipynb)
 * Day 2: Forecasting Demand from Unstructured Data
     * Example: [Natural Language Processing Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_nlp.ipynb)
         * Supplemental: [What are Embedding Layers in Keras](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_11_05_embedding.ipynb)
         * Supplemental: [Word2Vec Demo](https://turbomaze.github.io/word2vecjson/)
-        * Lab 3: NLP
     * Example: [Computer Vision Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_cv.ipynb)
         * Supplemental: [Deep Learning in your browser](https://cs.stanford.edu/people/karpathy/convnetjs/)
         * Supplemental: [YOLO](https://pytorch.org/hub/ultralytics_yolov5/)
         * Supplemental: [YOLO Ted Talk](https://www.youtube.com/watch?v=Cgxsv1riJhI&ab_channel=TED)
+        * Lab 3: Computer Vision
     * Example: [Meta Prophet](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_prophet.ipynb)
         * Supplemental: [Meta Prophet Official Site](https://facebook.github.io/prophet/)
         * Lab 4: Forecasting with Prophet
