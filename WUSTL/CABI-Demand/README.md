@@ -17,7 +17,7 @@ Source code for the course:
     * Utility: [GPU Status](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/status.ipynb)
     * Example: [Exploratory Data Analysis (EDA)](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_eda.ipynb) 
         * Supplemental: [Pandas](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/pandas.ipynb), [Pandas Course](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_02_1_python_pandas.ipynb)
-        * [Lab 1: EDA](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-1-eda.ipynb)
+        * [Lab 1: EDA](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab_1_eda.ipynb)
     * Example: [Naive Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_naive.ipynb)
         * Supplemental: [Neural Network Overview](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_03_1_neural_net.ipynb)
         * Supplemental: [Kaggle: Store Item Demand Forecasting Challenge](https://www.kaggle.com/c/demand-forecasting-kernels-only)
