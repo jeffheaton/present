@@ -11,7 +11,6 @@ You will store your files on [Google Drive](https://www.google.com/drive/). Plea
 
 
 Source code for the course: 
-*Note, I will tweak some of this code ahead of the course.*
 
 * Day 1: Forecasting Demand from Tabular Time Series Data
     * Utility: [GPU Status](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/status.ipynb)
