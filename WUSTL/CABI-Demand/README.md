@@ -10,6 +10,9 @@ You will store your files on [Google Drive](https://www.google.com/drive/). Plea
 [Introduction to Python and Google CoLab for Data Science and Machine Learning](https://www.youtube.com/watch?v=pNyZUrOQSrE&ab_channel=JeffHeaton)
 
 * [Day 1 Slides](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/cabi-dl-demand-forcasting-1.pptx)
+* [Day 2 Slides](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/cabi-dl-demand-forcasting-2.pptx)
+* [Gateway to Innovation Presentation](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/cabi-dl-demand-forcasting-2.pptx)
+* [Lapse and Mortality Experience of Post-Level Premium Period Term Plans](https://www.soa.org/49389a/globalassets/assets/files/research/projects/research-shock-lapse-report.pdf)
 
 Source code for the course: 
 
