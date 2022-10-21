@@ -22,7 +22,7 @@ Source code for the course:
         * Supplemental: [Neural Network Overview](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_03_1_neural_net.ipynb)
         * Supplemental: [Kaggle: Store Item Demand Forecasting Challenge](https://www.kaggle.com/c/demand-forecasting-kernels-only)
     * Example: [Seasonality Aware Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_seasonality.ipynb)
-        * [Lab 2: Feature Engineering](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-2-features.ipynb)
+        * [Lab 2: Feature Engineering](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-2-features.ipynb), [Lab 2 Solution](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab_2_features_solution.ipynb)
 * Day 2: Forecasting Demand from Unstructured Data
     * Example: [Natural Language Processing Forecast](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_nlp.ipynb)
         * Supplemental: [What are Embedding Layers in Keras](https://github.com/jeffheaton/t81_558_deep_learning/blob/master/t81_558_class_11_05_embedding.ipynb)
