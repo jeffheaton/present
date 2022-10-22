@@ -34,7 +34,7 @@ Source code for the course:
         * Supplemental: [Deep Learning in your browser](https://cs.stanford.edu/people/karpathy/convnetjs/)
         * Supplemental: [YOLO](https://pytorch.org/hub/ultralytics_yolov5/)
         * Supplemental: [YOLO Ted Talk](https://www.youtube.com/watch?v=Cgxsv1riJhI&ab_channel=TED)
-        * [Lab 3: Computer Vision](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-3-cv.ipynb)
+        * [Lab 3: Computer Vision](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-3-cv.ipynb), [Lab 3 Solution](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab_3_cv_solution.ipynb)
     * Example: [Meta Prophet](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/demand_prophet.ipynb)
         * Supplemental: [Meta Prophet Official Site](https://facebook.github.io/prophet/)
         * [Lab 4: Forecasting with Prophet](https://github.com/jeffheaton/present/blob/master/WUSTL/CABI-Demand/lab-4-prophet.ipynb)
