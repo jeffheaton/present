@@ -2,7 +2,11 @@
 
 Dynaface is an application that measures key facial symmetry statistics using artificial intelligence. Dynaface can measure both individual images and recorded video. This program calculates the degree of Facial paralysis and asymmetry caused by Bell's Palsy, cranial tumor resection, or other factors. We released this program under the [MIT License](https://opensource.org/license/mit/); this program is for educational and research purposes only. [[likely include paper citation]]
 
-We have provided both Macintosh and Windows versions of Dynaface. The Macintosh version requires a Mac M1 or later. The Windows application requires Windows 11 or higher and can optionally utilize an NVIDIA CUDA-compatible GPU to speed processing. [[once this is released, provide links for downloading]]
+We have provided both Macintosh and Windows versions of Dynaface. The Macintosh version requires a Mac M1 or later. The Windows application requires Windows 11 or higher and can optionally utilize an NVIDIA CUDA-compatible GPU to speed processing.
+
+Download links:
+
+- [Dynaface 1.0.3 for MacOS - Apple Silicone (M1/M2/etc)](https://s3.amazonaws.com/data.heatonresearch.com/dload/dynaface/1.0.3/Dynaface.pkg)
 
 When you launch Dynaface, you will see the following.
 
