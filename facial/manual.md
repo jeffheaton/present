@@ -6,7 +6,7 @@ We have provided both Macintosh and Windows versions of Dynaface. The Macintosh 
 
 Download links:
 
-- [Dynaface 1.0.3 for MacOS - Apple Silicone (M1/M2/etc)](https://s3.amazonaws.com/data.heatonresearch.com/dload/dynaface/1.0.3/Dynaface.pkg)
+- [Download](https://data.heatonresearch.com/dload/dynaface/index.html)
 
 When you launch Dynaface, you will see the following.
 
