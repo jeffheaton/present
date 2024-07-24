@@ -58,6 +58,18 @@ Whether you analyze an image or video, cropping and scaling are very important. 
 
 Generally, video or images captured with a handheld mobile device should be sufficient for Dynaface. Consider the image below; you can see how the program cropped and zoomed the patient to a consistent size and location within the frame.
 
+Under settings, there are three options to control how the images are stabilized and smoothed. These settings are as follows.
+
+- **Correct Tilt Greater Than**—This value is measured in degrees and will cause both video and still image analysis to rotate the image to correct any tilt. A value of 0 will always correct tilt, and a value of -1 disables this feature. The default is -1.
+- **Crop/zoom/tilt smoothing** The number of frames to average together to handle dynamic adjustment for tilt/zoom/position/crop. A value of 1 turns this off; 0 is invalid, and higher values will add more frames to the simple moving average smoothing calculation. This setting does not affect still images.
+- **Data Smoothing** The number of frames to average together to place the facial landmarks has a direct effect on the smoothness of the output data. A value of 0 is invalid, 1 disables, and higher values add more frames to the simple moving average. This setting does not affect still images.
+
+# Suggestions for Optimal Recordings
+
+For optimal results, try keeping the camera at a consistent distance from the subject. Try to minimize movement of the head within the frame and the degree to which the head tilts from side to side. Both ears should always be visible. The program can correct for side-to-side tilts of the head but not nods or rotations of the neck, where one of the ears is no longer visible. Such movements will always distort the measurements.
+
+If your video is high quality and without jerky unintentional movement, you can use a simple moving average to smooth the data. However, if there is considerable motion, the moving average will fail to keep up and distort the numbers.
+
 <img src="https://data.heatonresearch.com/images/facial/manual/1.0/dynaface-crop.jpg" width="512">
 
 # Analyzing Images
