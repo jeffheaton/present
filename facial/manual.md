@@ -80,7 +80,7 @@ When analyzing a single image, the window will appear as follows.
 
 <img src="https://data.heatonresearch.com/images/facial/manual/1.0/dynaface-image.jpg" width="512">
 
-You can select which messages you wish to see and notice that some measures have multiple sub-measures that you can turn on or off. You can copy and paste the measured image into other programs or save an image file with the measures.
+You can select which measures you wish to see and notice that some measures have multiple sub-measures that you can turn on or off. You can copy and paste the measured image into other programs or save an image file with the measures.
 
 # Analyzing Videos
 
